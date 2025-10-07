@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { useGetPdfBytes } from '@/entities/design/lib/observers/design-observers';
 import DesignClass from '@/entities/design/model/design.class';
+import DesignPage from '@/entities/design/ui/design-page/design-page';
 
 const DesignExample = () => {
   const [selectedFile, setSelectedFile] = useState<File | null | undefined>(null);
@@ -12,14 +13,14 @@ const DesignExample = () => {
   useEffect(() => {
     (async function () {
       if (!selectedFile) return;
-      // const url = 'https://pdf-lib.js.org/assets/with_update_sections.pdf';
-      // const response = await fetch(url);
 
       const arrayBuffer = await selectedFile?.arrayBuffer();
 
       await DesignClass.init(arrayBuffer);
     })();
   }, [selectedFile]);
+
+  //TODO: добавить рендер по страницам и сделать представления как для одной страницы, так и для всего документа
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px' }}>
@@ -34,7 +35,7 @@ const DesignExample = () => {
         }}
       />
 
-      {pdfBytes && <iframe style={{ minWidth: 200, minHeight: 500 }} src={pdfBytes}></iframe>}
+      {pdfBytes && <DesignPage imageUrl={pdfBytes} />}
     </div>
   );
 };

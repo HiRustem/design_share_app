@@ -1,11 +1,14 @@
 import { PDFDocument, PDFPage } from 'pdf-lib';
 
+import { convertPdfDocumentToUrl } from '@/entities/design/lib/design-converters';
+import getPdfPagesUrlArray from '@/entities/design/lib/get-pdf-pages-blob-array';
 import { ObservableStatic } from '@/shared/classes/observable';
 
 class DesignClass extends ObservableStatic {
   private static document: PDFDocument | null = null;
-  private static pdfBytes: Uint8Array<ArrayBufferLike> | null = null;
+  private static bytes: Uint8Array<ArrayBufferLike> | null = null;
   private static pages: PDFPage[] = [];
+  private static pagesUrlArray: string[] = [];
   private static pagesCount: number = 0;
   private static blobUrl: string | null = null;
 
@@ -15,16 +18,17 @@ class DesignClass extends ObservableStatic {
 
   public static async init(initialArrayBuffer: ArrayBuffer) {
     try {
-      const doc = await PDFDocument.load(initialArrayBuffer);
-      const pdfBytes = await doc.save();
-      const uintArray = new Uint8Array(pdfBytes);
-      const blobDocument = new Blob([uintArray], { type: 'application/pdf' });
+      const document = await PDFDocument.load(initialArrayBuffer);
+      const documentUrl = await convertPdfDocumentToUrl(document);
+      const pdfBytes = await document.save();
+      const pdfPagesUrlArray = await getPdfPagesUrlArray(document);
 
-      this.document = doc;
-      this.pages = doc.getPages();
-      this.pagesCount = doc.getPageCount();
-      this.pdfBytes = pdfBytes;
-      this.blobUrl = URL.createObjectURL(blobDocument);
+      this.document = document;
+      this.pages = document.getPages();
+      this.pagesCount = document.getPageCount();
+      this.bytes = pdfBytes;
+      this.blobUrl = documentUrl;
+      this.pagesUrlArray = pdfPagesUrlArray;
 
       this.emit('changed');
     } catch (e) {
@@ -37,11 +41,11 @@ class DesignClass extends ObservableStatic {
   }
 
   public static getPdfBytes() {
-    return this.pdfBytes;
+    return this.bytes;
   }
 
   public static getBlobUrl() {
-    return this.blobUrl;
+    return this.pagesUrlArray[0];
   }
 }
 
