@@ -5,8 +5,11 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useGetPdfBytes } from '@/entities/design/lib/observers/design-observers';
 import DesignClass from '@/entities/design/model/design.class';
+import { usePdfLibContext } from '@/shared/pdf-lib/context/use-pdf-lib-context';
 
 const DesignExample = () => {
+  const pdfLibContext = usePdfLibContext();
+
   const [pdfDoc, setPdfDoc] = useState<PDFDocumentProxy | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null | undefined>(null);
@@ -23,16 +26,12 @@ const DesignExample = () => {
   }, [selectedFile]);
 
   useEffect(() => {
-    if (!pdfBytes || pdfDoc) return;
+    if (!pdfBytes || pdfDoc || !pdfLibContext) return;
 
     (async () => {
-      const pdfjsLib = await import('pdfjs-dist');
-      pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-        'pdfjs-dist/build/pdf.worker.min.mjs',
-        import.meta.url,
-      ).toString();
+      if (!pdfLibContext?.pdfLib) return;
 
-      const loadingTask = pdfjsLib.getDocument(pdfBytes);
+      const loadingTask = pdfLibContext.pdfLib.getDocument(pdfBytes);
       const pdf = await loadingTask.promise;
 
       setPdfDoc(pdf);
@@ -47,7 +46,7 @@ const DesignExample = () => {
 
       await page.render({ canvas: canvas, canvasContext: context, viewport }).promise;
     })();
-  }, [pdfBytes, pdfDoc]);
+  }, [pdfBytes, pdfDoc, pdfLibContext]);
 
   //TODO: добавить рендер по страницам и сделать представления как для одной страницы, так и для всего документа
 
