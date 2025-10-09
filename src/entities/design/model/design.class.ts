@@ -36,16 +36,8 @@ class DesignClass extends ObservableStatic {
     }
   }
 
-  public static getDocument() {
-    return this.document;
-  }
-
-  public static getPdfBytes() {
-    return this.bytes;
-  }
-
-  public static getBlobUrl() {
-    return this.pagesUrlArray[0];
+  public static getPagesUrlArray() {
+    return this.pagesUrlArray;
   }
 }
 

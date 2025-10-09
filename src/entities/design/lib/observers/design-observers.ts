@@ -4,12 +4,12 @@ import { useSyncExternalStore } from 'react';
 
 import { DesignClass } from '@/entities/design';
 
-function useGetPdfBytes() {
+function useGetPagesUrlArray() {
   return useSyncExternalStore(
     (notify) => DesignClass.subscribe('changed', notify),
-    () => DesignClass.getBlobUrl(),
-    () => DesignClass.getBlobUrl(),
+    () => DesignClass.getPagesUrlArray(),
+    () => DesignClass.getPagesUrlArray(),
   );
 }
 
-export { useGetPdfBytes };
+export { useGetPagesUrlArray };
