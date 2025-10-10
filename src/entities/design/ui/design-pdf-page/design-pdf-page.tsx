@@ -1,13 +1,11 @@
 import { useEffect, useRef } from 'react';
 
-import drawPdfPage from '@/entities/design/lib/drawers/draw-pdf-page';
+import drawPdfPage from '@/entities/design/lib/draw-pdf-page';
 import { usePdfLibContext } from '@/shared/pdf-lib/context/use-pdf-lib-context';
 
-interface IDesignPage {
-  imageUrl: string;
-}
+import { IDesignPage } from '../../model/types';
 
-const DesignPdfPage = ({ imageUrl }: IDesignPage) => {
+const DesignPdfPage = ({ imageUrl, urlArrayLength, currentUrlIndex }: IDesignPage) => {
   const pdfLibContext = usePdfLibContext();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -19,14 +17,21 @@ const DesignPdfPage = ({ imageUrl }: IDesignPage) => {
       if (!pdfLibContext || !pdfLibContext?.pdfLib) return;
 
       const loadingTask = pdfLibContext.pdfLib.getDocument(imageUrl);
-      const pdfDocumentProxy = await loadingTask.promise;
-
-      await drawPdfPage({
-        canvas,
-        pdfDocumentProxy,
-      });
+      await loadingTask.promise
+        .then(async (pdfDocumentProxy) => {
+          await drawPdfPage({
+            canvas,
+            pdfDocumentProxy,
+            imageUrl,
+            urlArrayLength,
+            currentUrlIndex,
+          });
+        })
+        .finally(() => {
+          loadingTask.destroy();
+        });
     })();
-  }, [imageUrl, pdfLibContext]);
+  }, [imageUrl, pdfLibContext, currentUrlIndex, urlArrayLength]);
 
   return <canvas ref={canvasRef} />;
 };

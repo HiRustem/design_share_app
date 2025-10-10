@@ -13,6 +13,8 @@ const PdfLibProvider: FC<PropsWithChildren> = ({ children }) => {
         import.meta.url,
       ).toString();
 
+      pdfjsLib.GlobalWorkerOptions.workerPort?.terminate();
+
       setPdfLib(pdfjsLib);
     })();
   }, []);

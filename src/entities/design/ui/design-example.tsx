@@ -21,8 +21,6 @@ const DesignExample = () => {
     })();
   }, [selectedFile]);
 
-  //TODO: Очищать предыдущий рендер pdf при изменении документа
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px' }}>
       <input
@@ -37,7 +35,14 @@ const DesignExample = () => {
       />
 
       {pagesUrlArray.map((imageUrl, index) => {
-        return <DesignPdfPage key={index} imageUrl={imageUrl} />;
+        return (
+          <DesignPdfPage
+            key={index}
+            imageUrl={imageUrl}
+            urlArrayLength={pagesUrlArray.length}
+            currentUrlIndex={index}
+          />
+        );
       })}
     </div>
   );
